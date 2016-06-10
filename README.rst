@@ -48,12 +48,12 @@ Authorizing
 ^^^^^^^^^^^
 
 The ``ddp_authorize`` command expect the OAuth client id, secrete and
-the AuthCode obtained by usng the \`\ ``ddp_authorize_url`` URL
+the AuthCode obtained by using the ``ddp_authorize_url`` URL
 
 ::
 
     $ ddp_authorize
-    usage: ddp_authorize_url [client_id client_secret auth_code]
+    usage: ddp_authorize [client_id client_secret auth_code]
 
 Once this is done, a file ``.ddp_credentials`` is created and store the
 resulting redentials. The credentials from this file will be used from
@@ -67,10 +67,9 @@ Get UserList example:
 
 ::
 
-    from ddpclient import Auth, Selector, Client
+    from ddpclient import Selector, Client
 
-    api_auth = Auth()
-    api_service = Client(api_auth.get_credentials()).user_list_service()
+    api_service = Client().user_list_service()
     selector = Selector(api_service). \
         select_fields('Id', 'Size'). \
         filter_by('Status', 'CLOSED'). \
@@ -120,10 +119,9 @@ Add UserList example:
 
 ::
 
-    from ddpclient import Auth, Selector, Client, Operation
+    from ddpclient import Selector, Client, Operation
 
-    api_auth = Auth()
-    api_service = Client(api_auth.get_credentials()).user_list_service()
+    api_service = Client().user_list_service()
 
     api_operation = Operation(api_service).add().user_list(
         name='TEST',
@@ -165,8 +163,7 @@ Update UserList example:
 
     from ddpclient import Auth, Selector, Client, Operation
 
-    api_auth = Auth()
-    api_service = Client(api_auth.get_credentials()).user_list_service()
+    api_service = Client().user_list_service()
 
     api_operation = Operation(api_service).set().user_list(
         id=395677280, name='TEST Updated Name').build()
@@ -200,10 +197,9 @@ Remove UserList example:
 
 ::
 
-    from ddpclient import Auth, Selector, Client, Operation
+    from ddpclient import Selector, Client, Operation
 
-    api_auth = Auth()
-    api_service = Client(api_auth.get_credentials()).user_list_service()
+    api_service = Client().user_list_service()
     api_operation = Operation(api_service).remove().user_list(id=395677280).build()
 
     response = api_service.service.mutate([api_operation])

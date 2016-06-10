@@ -1,4 +1,5 @@
 from suds.client import Client as SudsClient
+from auth import Auth
 import os
 
 CLIENT_CUSTOMER_ID = os.getenv('DDP_CLIENT_CUSTOMER_ID', '123-456-7890')
@@ -11,8 +12,8 @@ class Client:
 
     soap_clients = {}
 
-    def __init__(self, credentials):
-        self.credentials = credentials
+    def __init__(self):
+        self.credentials = Auth().get_credentials()
 
     def user_list_service(self):
         return Client._create_soap_service(self, USER_LIST_SERVICE_WSDL_URL)
