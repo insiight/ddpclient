@@ -12,8 +12,9 @@ class Client:
 
     soap_clients = {}
 
-    def __init__(self):
-        self.credentials = Auth().get_credentials()
+    def __init__(self, credentials=None):
+        self.credentials = credentials if credentials is not None else Auth(
+        ).get_credentials()
 
     def user_list_service(self):
         return Client._create_soap_service(self, USER_LIST_SERVICE_WSDL_URL)

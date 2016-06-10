@@ -8,6 +8,14 @@ Installation
 
     pip install ddpclient
 
+
+Test
+----
+
+::
+
+    python setup.py test
+
 Requirement
 -----------
 
