@@ -11,13 +11,13 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='ddp-client',
-    version='0.1.0',
+    name='ddpclient',
+    version='0.1.1',
     description='A client library for DDP API',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/insiight/ddp-client',
+    url='https://github.com/insiight/ddpclient',
 
     # Author details
     author='David Lin',
@@ -36,7 +36,7 @@ setup(
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: AIP Client',
+        'Topic :: Software Development :: Libraries :: Python Modules',
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
