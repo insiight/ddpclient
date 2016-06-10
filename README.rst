@@ -1,6 +1,12 @@
 DDP API python client
 ---------------------
 
+This is a python client library for the OAuth2 DDP API. Currently the following services are supported:
+
+* UserListService
+* UserListClientService
+
+
 Installation
 ------------
 
