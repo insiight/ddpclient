@@ -77,13 +77,14 @@ Usage
 -----
 
 Get UserList example:
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
-    from ddpclient import Selector, Client
+    from ddpclient import Selector, Client, Auth
 
-    api_service = Client().user_list_service()
+    credentials = Auth().get_credentials()
+    api_service = Client(credentials).user_list_service()
     selector = Selector(api_service). \
         select_fields('Id', 'Size'). \
         filter_by('Status', 'CLOSED'). \
@@ -129,13 +130,14 @@ Get UserList example:
 
 
 Add UserList example:
-^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
-    from ddpclient import Selector, Client, Operation
+    from ddpclient import Selector, Client, Operation, Auth
 
-    api_service = Client().user_list_service()
+    credentials = Auth().get_credentials()
+    api_service = Client(credentials).user_list_service()
 
     api_operation = Operation(api_service).add().user_list(
         name='TEST',
@@ -177,7 +179,8 @@ Update UserList example:
 
     from ddpclient import Auth, Selector, Client, Operation
 
-    api_service = Client().user_list_service()
+    credentials = Auth().get_credentials()
+    api_service = Client(credentials).user_list_service()
 
     api_operation = Operation(api_service).set().user_list(
         id=395677280, name='TEST Updated Name').build()
@@ -211,9 +214,10 @@ Remove UserList example:
 
 ::
 
-    from ddpclient import Selector, Client, Operation
+    from ddpclient import Auth, Selector, Client, Operation
 
-    api_service = Client().user_list_service()
+    credentials = Auth().get_credentials()
+    api_service = Client(credentials).user_list_service()
     api_operation = Operation(api_service).remove().user_list(id=395677280).build()
 
     response = api_service.service.mutate([api_operation])
@@ -221,6 +225,76 @@ Remove UserList example:
 
     # suds.WebFault: Server raised fault: '[OperatorError.OPERATOR_NOT_SUPPORTED @ operations[0]]'
     # Note: UserListService does not support deleting user list, this code servers as example of 'remove' operations
+
+
+
+Classes
+-------
+
+``Auth``
+^^^^^^^^
+
+``Auth`` class can be used to generate URL (``authorize_url``) for user giving authorization:
+
+::
+
+    Auth().authorize_url(client_id, client_secret)
+
+
+
+``Auth`` also accept a auth code and obtain credentials after user having visited the above URL and granted the authorization to you application.
+The credentials object returned will be saved into a ``storage`` object.
+
+::
+
+    Auth().authorize(client_id, client_secret, auth_code)
+
+
+When the ``authorize`` method is done, by default ``Auth`` save the credentials object ( ``oauth2client.client.OAuth2Credentials``)
+into a file (``.ddp_credentials``) using ``oauth2client.file.Storage``. Once saved, this credential can be retrieved by:
+
+::
+
+    credentials = Auth().get_credentials()
+
+
+Saving credentials into a file for later retrieval is very simple but does not work for environments like Heroku.
+You might want to save the credentials object into a database so that the credentials can survive between deployments.
+The ``Auth`` constructor can accept a custom storage object with ``put`` and ``get`` methods defined.
+Using custom storage object can save/retrieve credentials object into/from a database, for example.
+
+::
+
+    storage = MyDBStorage()
+    auth = Auth(storage)
+
+    auth.authorize(client_id, client_secret, auth_code)
+    credentials = auth.get_credentials()
+
+
+``Client``
+^^^^^^^^^^
+
+``Client`` manages SOAP services. It requires an ``oauth2client.client.OAuth2Credentials`` object ( most likely retrieved by ``Auth``)
+to its constructor.
+
+``Client`` then use the crendentials details to make SOAP API calls to available services (``UserListService`` and ``UserListClientService``)
+
+
+::
+
+    credentials = Auth().get_credentials()
+    api_service = Client(credentials).user_list_service()
+
+
+``Selector`` and ``Operation``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Both available services support `get` and `mutate` operations.
+The `get` operation retrieve resource and `mutate` operation add, update and remove resource.
+
+``Selector`` is used to specified resource to retrieve and ``Operation`` is used to specify resource to mutate.
+
 
 
 .. _Developer Console: http://

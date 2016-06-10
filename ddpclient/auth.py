@@ -8,8 +8,9 @@ API_CREDENTIAL_FILE = '.ddp_credentials'
 
 
 class Auth:
-    def __init__(self):
-        self.storage = Storage(API_CREDENTIAL_FILE)
+    def __init__(self, storage=None):
+        self.storage = storage if storage is not None else Storage(
+            API_CREDENTIAL_FILE)
 
     def authorize_url(self, client_id, client_secret):
         flow = OAuth2WebServerFlow(client_id=client_id,
@@ -27,7 +28,7 @@ class Auth:
                                    redirect_uri=DDP_REDIRECT_URL)
 
         credentials = flow.step2_exchange(auth_code)
-        self.storage.put(credentials)
+        self.save_credentials(credentials)
 
         return credentials
 
@@ -39,3 +40,6 @@ class Auth:
             credentials.refresh(http)
 
         return credentials
+
+    def save_credentials(self, credentials):
+        self.storage.put(credentials)
