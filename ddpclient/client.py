@@ -1,5 +1,6 @@
 from suds.client import Client as SudsClient
 import os
+import httplib2
 
 USER_AGENT = 'DDP API Call'
 USER_LIST_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201603/UserListService?wsdl'
@@ -11,6 +12,11 @@ class Client:
     soap_clients = {}
 
     def __init__(self, credentials=None, client_customer_id=None):
+
+        if credentials.access_token_expired:
+            http = httplib2.Http()
+            credentials.refresh(http)
+
         self.credentials = credentials
         self.client_customer_id = os.getenv('DDP_CLIENT_CUSTOMER_ID',
                                             client_customer_id)

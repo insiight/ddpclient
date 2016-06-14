@@ -1,6 +1,5 @@
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.file import Storage
-import httplib2
 
 DDP_SCOPE = 'https://ddp.googleapis.com/api/ddp'
 DDP_REDIRECT_URL = 'urn:ietf:wg:oauth:2.0:oob'
@@ -33,13 +32,7 @@ class Auth:
         return credentials
 
     def get_credentials(self):
-        credentials = self.storage.get()
-
-        if credentials.access_token_expired:
-            http = httplib2.Http()
-            credentials.refresh(http)
-
-        return credentials
+        return self.storage.get()
 
     def save_credentials(self, credentials):
         self.storage.put(credentials)
