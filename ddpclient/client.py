@@ -1,7 +1,6 @@
 from suds.client import Client as SudsClient
 import os
 
-CLIENT_CUSTOMER_ID = os.getenv('DDP_CLIENT_CUSTOMER_ID', '123-456-7890')
 USER_AGENT = 'DDP API Call'
 USER_LIST_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201603/UserListService?wsdl'
 USER_LIST_CLIENT_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201605/UserListClientService?wsdl'
@@ -11,8 +10,10 @@ class Client:
 
     soap_clients = {}
 
-    def __init__(self, credentials=None):
+    def __init__(self, credentials=None, client_customer_id=None):
         self.credentials = credentials
+        self.client_customer_id = os.getenv('DDP_CLIENT_CUSTOMER_ID',
+                                            client_customer_id)
 
     def user_list_service(self):
         return Client._create_soap_service(self, USER_LIST_SERVICE_WSDL_URL)
@@ -38,10 +39,8 @@ class Client:
         soap_client.set_options(headers=http_headers)
 
         # set soap headers
-        soap_headers = {'clientCustomerId': CLIENT_CUSTOMER_ID,
-                        'userAgent': USER_AGENT}
         soap_headers = soap_client.factory.create('SoapHeader')
-        soap_headers.clientCustomerId = CLIENT_CUSTOMER_ID
+        soap_headers.clientCustomerId = self.client_customer_id
         soap_headers.userAgent = USER_AGENT
         soap_client.set_options(soapheaders=soap_headers)
 

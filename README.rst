@@ -39,13 +39,17 @@ Requirement
    A unique three-part number that’s assigned to each AdWords account,
    listed at the top of every page in your account.
 
-   You must set it as environment variable `DDP_CLIENT_CUSTOMER_ID`
+   You can set it as an environment variable `DDP_CLIENT_CUSTOMER_ID`. Or you can pass the ID into the `Client` class constructor (details below).
 
 Commands
 --------
 
 When installed, the DDP API client provide two command for authorizing
 your application access to a DDP account.
+
+These commands are provided to help quickly getting access to the DDP API to run the examples.
+It stores crendentials in a file named ``.ddp_credentials``.
+If you are using Flask or Django, consider using the ``oauth2client.contrib.flask_util`` and ``oauth2client.contrib.django_util``
 
 Generate Authorize URL
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -276,15 +280,17 @@ Using custom storage object can save/retrieve credentials object into/from a dat
 ^^^^^^^^^^
 
 ``Client`` manages SOAP services. It requires an ``oauth2client.client.OAuth2Credentials`` object ( most likely retrieved by ``Auth``)
-to its constructor.
+to its constructor. ``Client`` then use the crendentials details to make SOAP API calls to available services (``UserListService`` and ``UserListClientService``)
 
-``Client`` then use the crendentials details to make SOAP API calls to available services (``UserListService`` and ``UserListClientService``)
+A client customer id is also required to set the SOAP header in every request. You can provide it via an environment variable ``DDP_CLIENT_CUSTOMER_ID`` or pass it
+explicitly to the constructor.
 
 
 ::
 
     credentials = Auth().get_credentials()
-    api_service = Client(credentials).user_list_service()
+    client_customer_id = '123-123-1234'
+    api_service = Client(credentials, client_customer_id).user_list_service()
 
 
 ``Selector`` and ``Operation``
