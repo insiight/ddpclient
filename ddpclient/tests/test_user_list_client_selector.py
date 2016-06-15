@@ -14,7 +14,8 @@ class TestUserListClientSelector(TestCase):
     def test_from_date_range(self):
         selector = self.selector.from_date_range(
             datetime.date(2011, 5, 6), datetime.date(
-                2016, 3, 4)).build(self.client.user_list_client_service())
+                2016, 3,
+                4)).build(self.client.user_list_client_service_soap_client)
 
         print selector
         self.assertEqual(2011, selector.dateRange.min.year)

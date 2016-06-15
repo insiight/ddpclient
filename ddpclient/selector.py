@@ -1,38 +1,16 @@
 import datetime
+from soap_entity import SoapEntity
 
 
-class Selector(object):
+class Selector(SoapEntity):
     def __init__(self):
-        # https://fedorahosted.org/suds/wiki/TipsAndTricks#TypesNamesContaining
-        # client.factory.separator('/')
         self.selector_data = {}
         self.selector_data['fields'] = []
         self.selector_data['predicates'] = []
         self.selector_data['ordering'] = []
 
     def build(self, soap_client):
-        return self._build_type(soap_client, ('Selector', self.selector_data))
-
-    def _build_type(self, soap_client, data):
-
-        if type(data) is tuple:
-            t, d = data
-            type_obj = soap_client.factory.create(t)
-
-            if type(d) is dict:
-                for sub_k, sub_data in d.iteritems():
-                    type_obj[sub_k] = self._build_type(soap_client, sub_data)
-
-                return type_obj
-            else:
-                return type_obj[d]
-        elif type(data) is list:
-
-            return [self._build_type(soap_client, sub_data)
-                    for sub_data in data]
-
-        else:
-            return data
+        return self.build_type(soap_client, ('Selector', self.selector_data))
 
     def select_fields(self, *args):
         self.selector_data['fields'] = list(args)

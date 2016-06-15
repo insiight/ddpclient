@@ -1,5 +1,6 @@
 from suds.client import Client as SudsClient
 from . import UserListClientSelector, UserListSelector
+from operation import Operation
 import os
 import httplib2
 
@@ -60,5 +61,48 @@ class Client(object):
 
         return None
 
-    def mutate(operation):
-        pass
+    def create_empty_user_list(self, is_logical=False):
+        type_name = 'LogicalUserList' if is_logical else 'BasicUserList'
+        return self.user_list_service_soap_client.factory.create(type_name)
+
+    def create_empty_user_list_client(self, is_logical=False):
+        return self.user_list_client_service_soap_client.factory.create(
+            'UserListClient')
+
+    def add(self, entity):
+        soap_client = self._parse_entity_for_soap_client(entity)
+        operation = self._parse_entity_for_operation(entity)
+        return soap_client.service.mutate(operation.add(entity).build(
+            soap_client))
+
+    def set(self, entity):
+        soap_client = self._parse_entity_for_soap_client(entity)
+        operation = self._parse_entity_for_operation(entity)
+        return soap_client.service.mutate(operation.set(entity).build(
+            soap_client))
+
+    def remove(self, entity):
+        soap_client = self._parse_entity_for_soap_client(entity)
+        operation = self._parse_entity_for_operation(entity)
+        return soap_client.service.mutate(operation.remove(entity).build(
+            soap_client))
+
+    def _parse_entity_for_soap_client(self, entity):
+        soap_client = None
+
+        if hasattr(entity, 'UserList.Type'):
+            soap_client = self.user_list_service_soap_client
+        elif hasattr(entity, 'clientId') and hasattr(entity, 'userListId'):
+            soap_client = self.user_list_client_service_soap_client
+
+        return soap_client
+
+    def _parse_entity_for_operation(self, entity):
+        operation = None
+
+        if hasattr(entity, 'UserList.Type'):
+            operation = Operation('UserListOperation')
+        elif hasattr(entity, 'clientId') and hasattr(entity, 'userListId'):
+            operation = Operation('UserListClientOperation')
+
+        return operation

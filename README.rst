@@ -85,17 +85,16 @@ Get UserList example:
 
 ::
 
-    from ddpclient import Selector, Client, Auth
+    from ddpclient import UserListSelector, Client, Auth
 
     credentials = Auth().get_credentials()
-    api_service = Client(credentials).user_list_service()
-    selector = Selector(api_service). \
+    api_client = Client(credentials)
+    selector = UserListSelector(). \
         select_fields('Id', 'Size'). \
         filter_by('Status', 'CLOSED'). \
         order_by('Id', True). \
-        at_page(1, 3). \
-        build()
-    response = api_service.service.get(selector)
+        at_page(1, 3)
+    response = api_client.get(selector)
 
     print response
 
@@ -138,22 +137,22 @@ Add UserList example:
 
 ::
 
-    from ddpclient import Selector, Client, Operation, Auth
+    from ddpclient import UserListSelector, Client, Auth
 
     credentials = Auth().get_credentials()
-    api_service = Client(credentials).user_list_service()
+    api_client = Client(credentials)
 
-    api_operation = Operation(api_service).add().user_list(
-        name='TEST',
-        description='TEST Description',
-        status='CLOSED',
-        integrationCode='123',
-        accountUserListStatus='INACTIVE',
-        membershipLifeSpan=30).build()
+    new_user_list = api_client.create_empty_user_list()
+    new_user_list.name = 'TEST'
+    new_user_list.description = 'TEST Description'
+    new_user_list.status = 'CLOSED'
+    new_user_list.integrationCode = '123'
+    new_user_list.accountUserListStatus = 'INACTIVE'
 
-    response = api_service.service.mutate([api_operation])
+    response = api_client.add(new_user_list)
 
     print response
+
 
     # (UserListReturnValue){
     #    ListReturnValue.Type = "UserListReturnValue"
@@ -181,15 +180,17 @@ Update UserList example:
 
 ::
 
-    from ddpclient import Auth, Selector, Client, Operation
+    from ddpclient import UserListSelector, Client, Auth
 
     credentials = Auth().get_credentials()
-    api_service = Client(credentials).user_list_service()
+    api_client = Client(credentials)
 
-    api_operation = Operation(api_service).set().user_list(
-        id=395677280, name='TEST Updated Name').build()
+    new_user_list = api_client.create_empty_user_list()
+    new_user_list.id = 12345678
+    new_user_list.description = 'TEST Description'
 
-    response = api_service.service.mutate([api_operation])
+    response = api_client.set(new_user_list)
+
     print response
 
     # (UserListReturnValue){
@@ -218,13 +219,16 @@ Remove UserList example:
 
 ::
 
-    from ddpclient import Auth, Selector, Client, Operation
+    from ddpclient import UserListSelector, Client, Auth
 
     credentials = Auth().get_credentials()
-    api_service = Client(credentials).user_list_service()
-    api_operation = Operation(api_service).remove().user_list(id=395677280).build()
+    api_client = Client(credentials)
 
-    response = api_service.service.mutate([api_operation])
+    new_user_list = api_client.create_empty_user_list()
+    new_user_list.id = 395803975
+
+    response = api_client.remove(new_user_list)
+
     print response
 
     # suds.WebFault: Server raised fault: '[OperatorError.OPERATOR_NOT_SUPPORTED @ operations[0]]'
@@ -290,18 +294,27 @@ explicitly to the constructor.
 
     credentials = Auth().get_credentials()
     client_customer_id = '123-123-1234'
-    api_service = Client(credentials, client_customer_id).user_list_service()
+    api_service = Client(credentials, client_customer_id).user_list_service_soap_client
 
 
-``Selector`` and ``Operation``
+``UserListSelector`` and ``UserListClientSelector``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Both available services support `get` and `mutate` operations.
-The `get` operation retrieve resource and `mutate` operation add, update and remove resource.
-
-``Selector`` is used to specified resource to retrieve and ``Operation`` is used to specify resource to mutate.
+These two selector classes are provided to specified entities to retrieve. They share the same interface. Example
 
 
+::
+
+    from ddpclient import UserListClientSelector, Client, Auth
+    import datetime
+
+    selector = UserListClientSelector(). \
+        select_fields('ClientCustomerName', 'UserListId'). \
+        filter_by('Status', 'ACTIVE'). \
+        order_by('UserListId'). \
+        order_by('ClientCustomerName', desc=True). \
+        from_date_range(datetime.date(2016, 1, 1), datetime.date(2016, 1, 7)). \
+        at_page(1, 3)
 
 .. _Developer Console: http://
 .. _Customer ID: https://support.google.com/adwords/answer/29198?hl=en-AU
