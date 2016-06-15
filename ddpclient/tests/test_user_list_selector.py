@@ -1,14 +1,15 @@
 from unittest import TestCase
-from ddpclient import Selector, Client
+from ddpclient import UserListSelector, Client
 from oauth2client.client import OAuth2Credentials
 import datetime
 
 
-class TestClient(TestCase):
+class TestUserListSelector(TestCase):
     def setUp(self):
         client = Client(OAuth2Credentials('token', 'clientid', 'secret',
-                                          'rtoken', 'exp', 'uri', 'ua'))
-        self.selector = Selector(client.user_list_service())
+                                          'rtoken', datetime.datetime(
+                                              2038, 1, 1), 'uri', 'ua'))
+        self.selector = UserListSelector(client.user_list_service())
 
     def test_select_fields(self):
         selector = self.selector.select_fields('Id', 'Name',

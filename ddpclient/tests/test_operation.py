@@ -2,12 +2,14 @@ from unittest import TestCase
 
 from ddpclient import Client, Operation
 from oauth2client.client import OAuth2Credentials
+import datetime
 
 
 class TestOperation(TestCase):
     def setUp(self):
         client = Client(OAuth2Credentials('token', 'clientid', 'secret',
-                                          'rtoken', 'exp', 'uri', 'ua'))
+                                          'rtoken', datetime.datetime(
+                                              2038, 1, 1), 'uri', 'ua'))
 
         self.operation = Operation(client.user_list_service())
 

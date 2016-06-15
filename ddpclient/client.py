@@ -1,4 +1,5 @@
 from suds.client import Client as SudsClient
+from . import UserListClientSelector, UserListSelector
 import os
 import httplib2
 
@@ -51,3 +52,12 @@ class Client:
         soap_client.set_options(soapheaders=soap_headers)
 
         return soap_client
+
+    def get(self, selector):
+        if type(selector) is UserListClientSelector:
+            return self.user_list_service().service
+        elif type(selector) is UserLIstSelector:
+            pass
+
+    def mutate(operation):
+        pass

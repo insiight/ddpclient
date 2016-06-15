@@ -1,4 +1,5 @@
-from selector import Selector
+from user_list_client_selector import UserListClientSelector
+from user_list_selector import UserListSelector
 from client import Client
 from auth import Auth
 from operation import Operation
