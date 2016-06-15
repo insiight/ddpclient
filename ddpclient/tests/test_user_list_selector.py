@@ -6,20 +6,20 @@ import datetime
 
 class TestUserListSelector(TestCase):
     def setUp(self):
-        client = Client(OAuth2Credentials('token', 'clientid', 'secret',
-                                          'rtoken', datetime.datetime(
-                                              2038, 1, 1), 'uri', 'ua'))
-        self.selector = UserListSelector(client.user_list_service())
+        self.client = Client(OAuth2Credentials('token', 'clientid', 'secret',
+                                               'rtoken', datetime.datetime(
+                                                   2038, 1, 1), 'uri', 'ua'))
+        self.selector = UserListSelector()
 
     def test_select_fields(self):
-        selector = self.selector.select_fields('Id', 'Name',
-                                               'Description').build()
+        selector = self.selector.select_fields(
+            'Id', 'Name', 'Description').build(self.client.user_list_service())
 
         self.assertItemsEqual(['Id', 'Name', 'Description'], selector.fields)
 
     def test_filter_by(self):
         selector = self.selector.filter_by('Name', 'Test').filter_by(
-            'Id', 100, '>=').build()
+            'Id', 100, '>=').build(self.client.user_list_service())
 
         predicate = selector.predicates[0]
 
@@ -34,8 +34,8 @@ class TestUserListSelector(TestCase):
         self.assertEqual(100, predicate.values)
 
     def test_order_by(self):
-        selector = self.selector.order_by('Id').order_by('Name',
-                                                         desc=True).build()
+        selector = self.selector.order_by('Id').order_by(
+            'Name', desc=True).build(self.client.user_list_service())
 
         self.assertEqual('Id', selector.ordering[0].field)
         self.assertEqual('ASCENDING', selector.ordering[0].sortOrder)
@@ -44,13 +44,15 @@ class TestUserListSelector(TestCase):
 
     def test_from_date_range(self):
         selector = self.selector.from_date_range(
-            datetime.date(2011, 5, 6), datetime.date(2016, 3, 4)).build()
+            datetime.date(2011, 5, 6),
+            datetime.date(2016, 3, 4)).build(self.client.user_list_service())
 
         self.assertEqual('20110506', selector.dateRange.min)
         self.assertEqual('20160304', selector.dateRange.max)
 
     def test_at_page(self):
-        selector = self.selector.at_page(2, 12).build()
+        selector = self.selector.at_page(
+            2, 12).build(self.client.user_list_service())
 
         self.assertEqual(2, selector.paging.startIndex)
         self.assertEqual(12, selector.paging.numberResults)

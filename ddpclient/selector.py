@@ -2,74 +2,81 @@ import datetime
 
 
 class Selector(object):
-    def __init__(self, client):
+    def __init__(self):
         # https://fedorahosted.org/suds/wiki/TipsAndTricks#TypesNamesContaining
-        client.factory.separator('/')
-        self.client = client
-        self.fields = []
-        self.predicates = []
-        self.date_range = None
-        self.ordering = []
-        self.paging = None
+        # client.factory.separator('/')
+        self.selector_data = {}
+        self.selector_data['fields'] = []
+        self.selector_data['predicates'] = []
+        self.selector_data['ordering'] = []
 
-    def build(self):
-        selector = self.client.factory.create('Selector')
-        selector.fields = self.fields if self.fields else None
-        selector.predicates = self.predicates if self.predicates else None
-        selector.dateRange = self.date_range if self.date_range else None
-        selector.ordering = self.ordering if self.ordering else None
-        selector.paging = self.paging if self.paging else None
+    def build(self, soap_client):
+        return self._build_type(soap_client, ('Selector', self.selector_data))
 
-        return selector
+    def _build_type(self, soap_client, data):
+
+        if type(data) is tuple:
+            t, d = data
+            type_obj = soap_client.factory.create(t)
+
+            if type(d) is dict:
+                for sub_k, sub_data in d.iteritems():
+                    type_obj[sub_k] = self._build_type(soap_client, sub_data)
+
+                return type_obj
+            else:
+                return type_obj[d]
+        elif type(data) is list:
+
+            return [self._build_type(soap_client, sub_data)
+                    for sub_data in data]
+
+        else:
+            return data
 
     def select_fields(self, *args):
-        self.fields = args
+        self.selector_data['fields'] = list(args)
         return self
 
     # filter criteria
     def filter_by(self, field, values, operator='=='):
-        predicate = self.client.factory.create('Predicate')
-        predicate.field = field
-        predicate.operator = Selector._create_predicate_operator(self,
-                                                                 operator)
-        predicate.values = values
+        self.selector_data['predicates'].append(
+            ('Predicate', {'field': field,
+                           'operator':
+                           self._create_predicate_operator(operator),
+                           'values': values}))
 
-        self.predicates.append(predicate)
         return self
 
     def order_by(self, field, desc=False):
         '''sortting a field by either 'ASCENDING' or 'DESCENDING' order.'''
-        ordering = self.client.factory.create('OrderBy')
-        ordering.field = field
-        sort_order = self.client.factory.create('SortOrder')
-        ordering.sortOrder = sort_order.DESCENDING if desc else sort_order.ASCENDING
 
-        self.ordering.append(ordering)
+        sort_order = ('SortOrder', 'DESCENDING' if desc else 'ASCENDING')
+        self.selector_data['ordering'].append(('OrderBy', {'field': field,
+                                                           'sortOrder':
+                                                           sort_order}))
+
         return self
 
     def at_page(self, start_index=0, page_size=100):
-        page = self.client.factory.create('Paging')
-        page.startIndex = start_index
-        page.numberResults = page_size
-
-        self.paging = page
+        self.selector_data['paging'] = ('Paging', {'startIndex': start_index,
+                                                   'numberResults': page_size})
 
         return self
 
     def _create_predicate_operator(self, short_operator_name):
-        predicate_operator = self.client.factory.create('Predicate.Operator')
-        operatorr_map = {'!=': predicate_operator.NOT_EQUALS,
-                         '<>': predicate_operator.NOT_EQUALS,
-                         '==': predicate_operator.EQUALS,
-                         '>': predicate_operator.GREATER_THAN,
-                         '>=': predicate_operator.GREATER_THAN_EQUALS,
-                         '<': predicate_operator.LESS_THAN,
-                         '<=': predicate_operator.LESS_THAN_EQUALS,
-                         '[]': predicate_operator.IN,
-                         '][': predicate_operator.NOT_IN}
+        operatorr_map = {'!=': 'NOT_EQUALS',
+                         '<>': 'NOT_EQUALS',
+                         '==': 'EQUALS',
+                         '>': 'GREATER_THAN',
+                         '>=': 'GREATER_THAN_EQUALS',
+                         '<': 'LESS_THAN',
+                         '<=': 'LESS_THAN_EQUALS',
+                         '[]': 'IN',
+                         '][': 'NOT_IN'}
 
         match_operator = operatorr_map[
             short_operator_name] if operatorr_map.has_key(
                 short_operator_name) else short_operator_name
 
-        return predicate_operator[match_operator]
+        return ('Predicate.Operator', match_operator)

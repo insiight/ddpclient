@@ -8,7 +8,7 @@ USER_LIST_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v20160
 USER_LIST_CLIENT_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201605/UserListClientService?wsdl'
 
 
-class Client:
+class Client(object):
 
     soap_clients = {}
 
@@ -21,20 +21,11 @@ class Client:
         self.credentials = credentials
         self.client_customer_id = os.getenv('DDP_CLIENT_CUSTOMER_ID',
                                             client_customer_id)
+        self.user_list_service_soap_client = self._create_soap_client(
+            USER_LIST_SERVICE_WSDL_URL)
 
-    def user_list_service(self):
-        return Client._create_soap_service(self, USER_LIST_SERVICE_WSDL_URL)
-
-    def user_list_client_service(self):
-        return Client._create_soap_service(self,
-                                           USER_LIST_CLIENT_SERVICE_WSDL_URL)
-
-    def _create_soap_service(self, wsdl_url):
-        if not Client.soap_clients.has_key(wsdl_url):
-            Client.soap_clients[wsdl_url] = Client._create_soap_client(
-                self, wsdl_url)
-
-        return Client.soap_clients[wsdl_url]
+        self.user_list_client_service_soap_client = self._create_soap_client(
+            USER_LIST_CLIENT_SERVICE_WSDL_URL)
 
     def _create_soap_client(self, url):
         soap_client = SudsClient(url)
@@ -51,13 +42,23 @@ class Client:
         soap_headers.userAgent = USER_AGENT
         soap_client.set_options(soapheaders=soap_headers)
 
+        # https://fedorahosted.org/suds/wiki/TipsAndTricks#TypesNamesContaining
+        soap_client.factory.separator('/')
+
         return soap_client
 
     def get(self, selector):
-        if type(selector) is UserListClientSelector:
-            return self.user_list_service().service
-        elif type(selector) is UserLIstSelector:
-            pass
+        soap_client = None
+
+        if type(selector) is UserListSelector:
+            soap_client = self.user_list_service_soap_client
+        elif type(selector) is UserListClientSelector:
+            soap_client = self.user_list_client_service_soap_client
+
+        if soap_client is not None:
+            return soap_client.service.get(selector.build(soap_client))
+
+        return None
 
     def mutate(operation):
         pass
