@@ -22,6 +22,14 @@ Test
 
     python setup.py test
 
+Deploy
+----
+
+::
+
+    python setup.py dist upload
+
+
 Requirement
 -----------
 
