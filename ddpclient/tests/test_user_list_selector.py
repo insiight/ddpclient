@@ -16,7 +16,7 @@ class TestUserListSelector(TestCase):
             'Id', 'Name',
             'Description').build(self.client.user_list_service_soap_client)
 
-        self.assertItemsEqual(['Id', 'Name', 'Description'], selector.fields)
+        self.assertEqual(['Id', 'Name', 'Description'], selector.fields)
 
     def test_filter_by(self):
         selector = self.selector.filter_by('Name', 'Test').filter_by(

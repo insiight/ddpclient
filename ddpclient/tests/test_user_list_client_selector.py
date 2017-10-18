@@ -17,7 +17,7 @@ class TestUserListClientSelector(TestCase):
                 2016, 3,
                 4)).build(self.client.user_list_client_service_soap_client)
 
-        print selector
+        print(selector)
         self.assertEqual(2011, selector.dateRange.min.year)
         self.assertEqual(5, selector.dateRange.min.month)
         self.assertEqual(6, selector.dateRange.min.day)

@@ -24,6 +24,7 @@ Test
 
 Deploy
 ----
+Update the version and dependencies in `setup.py` and then:
 
 ::
 

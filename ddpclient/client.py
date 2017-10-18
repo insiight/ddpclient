@@ -1,12 +1,13 @@
 from suds.client import Client as SudsClient
-from . import UserListClientSelector, UserListSelector
-from operation import Operation
+from .user_list_client_selector import UserListClientSelector
+from .user_list_selector import UserListSelector
+from .operation import Operation
 import os
 import httplib2
 
 USER_AGENT = 'DDP API Call'
-USER_LIST_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201609/UserListService?wsdl'
-USER_LIST_CLIENT_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201609/UserListClientService?wsdl'
+USER_LIST_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201710/UserListService?wsdl'
+USER_LIST_CLIENT_SERVICE_WSDL_URL = 'https://ddp.googleapis.com/api/ddp/provider/v201710/UserListClientService?wsdl'
 
 
 class Client(object):

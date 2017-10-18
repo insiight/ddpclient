@@ -1,4 +1,4 @@
-from selector import Selector
+from .selector import Selector
 
 
 class UserListClientSelector(Selector):
@@ -15,12 +15,13 @@ class UserListClientSelector(Selector):
 
         self.selector_data['dateRange'] = ('DateRange',
                                            {'min':
-                                            ('Date', {'year': min_date.year,
-                                                      'month': min_date.month,
-                                                      'day': min_date.day}),
+                                                ('Date', {'year': min_date.year,
+                                                          'month': min_date.month,
+                                                          'day': min_date.day}),
                                             'max':
-                                            ('Date', {'year': max_date.year,
-                                                      'month': max_date.month,
-                                                      'day': max_date.day})})
+                                                ('Date', {'year': max_date.year,
+                                                          'month': max_date.month,
+                                                          'day': max_date.day})}
+                                           )
 
         return self

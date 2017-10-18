@@ -1,5 +1,4 @@
-import datetime
-from soap_entity import SoapEntity
+from .soap_entity import SoapEntity
 
 
 class Selector(SoapEntity):
@@ -21,7 +20,7 @@ class Selector(SoapEntity):
         self.selector_data['predicates'].append(
             ('Predicate', {'field': field,
                            'operator':
-                           self._create_predicate_operator(operator),
+                               self._create_predicate_operator(operator),
                            'values': values}))
 
         return self
@@ -32,7 +31,7 @@ class Selector(SoapEntity):
         sort_order = ('SortOrder', 'DESCENDING' if desc else 'ASCENDING')
         self.selector_data['ordering'].append(('OrderBy', {'field': field,
                                                            'sortOrder':
-                                                           sort_order}))
+                                                               sort_order}))
 
         return self
 
@@ -54,7 +53,6 @@ class Selector(SoapEntity):
                          '][': 'NOT_IN'}
 
         match_operator = operatorr_map[
-            short_operator_name] if operatorr_map.has_key(
-                short_operator_name) else short_operator_name
+            short_operator_name] if short_operator_name in operatorr_map else short_operator_name
 
         return ('Predicate.Operator', match_operator)
